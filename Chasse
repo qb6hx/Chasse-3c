@@ -1,0 +1,30 @@
+name: chasse
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  chasse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Télécharger le dépôt
+        uses: actions/checkout@v4
+
+      - name: Restaurer les résultats précédents
+        uses: actions/cache@v4
+        with:
+          path: trouves.txt
+          key: hits-${{ github.run_id }}
+          restore-keys: hits-
+
+      - name: Lancer le bot
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: python3 chasse.py --batch 400
